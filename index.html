@@ -1,0 +1,1054 @@
+<!DOCTYPE html>
+<html lang="fr" dir="ltr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>TU ME CONNAIS VRAIMENT ? ❤️</title>
+  <meta name="description" content="Jeu convivial et interactif pour deux personnes afin de tester à quel point vous vous connaissez vraiment.">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>❤️</text></svg>">
+  <style>
+    :root {
+      --primary: #E11D48;
+      --primary-hover: #BE123C;
+      --primary-container: #FFE4E6;
+      --on-primary-container: #9F1239;
+      --secondary: #F59E0B;
+      --secondary-container: #FEF3C7;
+      --success: #10B981;
+      --success-light: #D1FAE5;
+      --error: #EF4444;
+      --error-light: #FEE2E2;
+      --bg: #FFF8F9;
+      --surface: #FFFFFF;
+      --surface-variant: #FCE7ED;
+      --text: #1F2937;
+      --text-muted: #6B7280;
+      --radius: 20px;
+      --shadow: 0 8px 24px rgba(225, 29, 72, 0.08);
+      --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+    body {
+      font-family: var(--font);
+      background: linear-gradient(180deg, #FFF1F2 0%, #FFFFFF 50%, #FFF5F5 100%);
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: relative;
+    }
+    canvas#particles {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      pointer-events: none;
+      z-index: 0;
+    }
+    #app-container {
+      width: 100%;
+      max-width: 520px;
+      min-height: 100vh;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      z-index: 1;
+    }
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 4px 16px;
+    }
+    .brand-chip, .lang-chip {
+      background: var(--surface);
+      padding: 6px 14px;
+      border-radius: 999px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      user-select: none;
+      border: 1px solid rgba(0,0,0,0.05);
+    }
+    .brand-chip {
+      color: var(--primary);
+    }
+    .card {
+      background: var(--surface);
+      border-radius: var(--radius);
+      padding: 24px;
+      box-shadow: var(--shadow);
+      margin-bottom: 16px;
+      border: 1px solid rgba(225, 29, 72, 0.08);
+      position: relative;
+    }
+    .btn {
+      width: 100%;
+      min-height: 52px;
+      border-radius: 14px;
+      border: none;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: all 0.2s ease;
+      font-family: inherit;
+    }
+    .btn:active {
+      transform: scale(0.98);
+    }
+    .btn-primary {
+      background: var(--primary);
+      color: #FFF;
+      box-shadow: 0 4px 14px rgba(225, 29, 72, 0.3);
+    }
+    .btn-secondary {
+      background: var(--secondary);
+      color: #FFF;
+      box-shadow: 0 4px 14px rgba(245, 158, 11, 0.3);
+    }
+    .btn-success {
+      background: var(--success);
+      color: #FFF;
+      box-shadow: 0 4px 14px rgba(16, 185, 129, 0.3);
+    }
+    .btn-error {
+      background: var(--error);
+      color: #FFF;
+      box-shadow: 0 4px 14px rgba(239, 68, 68, 0.3);
+    }
+    .btn-outline {
+      background: transparent;
+      border: 1.5px solid var(--primary);
+      color: var(--primary);
+    }
+    .btn-ghost {
+      background: transparent;
+      color: var(--text-muted);
+    }
+    input[type="text"], input[type="password"], textarea {
+      width: 100%;
+      padding: 14px 16px;
+      border-radius: 12px;
+      border: 1.5px solid #E5E7EB;
+      font-size: 15px;
+      font-family: inherit;
+      outline: none;
+      transition: border 0.2s;
+      background: #FAFAFA;
+      color: var(--text);
+    }
+    input[type="text"]:focus, textarea:focus {
+      border-color: var(--primary);
+      background: #FFF;
+    }
+    .options-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 10px;
+    }
+    .chip {
+      padding: 8px 14px;
+      border-radius: 10px;
+      background: #F3F4F6;
+      border: 1px solid #E5E7EB;
+      font-size: 14px;
+      cursor: pointer;
+      user-select: none;
+      transition: all 0.15s;
+    }
+    .chip.active {
+      background: var(--primary);
+      color: #FFF;
+      border-color: var(--primary);
+      font-weight: 700;
+    }
+    .screen {
+      display: none;
+      flex-direction: column;
+      flex: 1;
+      animation: fadeIn 0.25s ease forwards;
+    }
+    .screen.active {
+      display: flex;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    /* Fixed Answer Box - High Contrast & Visible */
+    .answer-highlight-card {
+      background: #FFFFFF;
+      border: 3px solid var(--primary);
+      border-radius: 18px;
+      padding: 20px;
+      text-align: center;
+      margin: 16px 0;
+      box-shadow: 0 8px 20px rgba(225, 29, 72, 0.15);
+    }
+    .answer-highlight-label {
+      background: var(--primary);
+      color: #FFFFFF;
+      display: inline-block;
+      padding: 4px 14px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 12px;
+    }
+    .answer-highlight-text {
+      background: var(--primary-container);
+      color: var(--on-primary-container);
+      font-size: 24px;
+      font-weight: 900;
+      padding: 16px;
+      border-radius: 14px;
+      word-break: break-word;
+      line-height: 1.3;
+    }
+    .modal-backdrop {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0,0,0,0.5);
+      backdrop-filter: blur(4px);
+      z-index: 100;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+    .modal-backdrop.open {
+      display: flex;
+    }
+    .modal-card {
+      background: #FFF;
+      width: 100%;
+      max-width: 440px;
+      border-radius: 20px;
+      padding: 24px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    }
+    .notification-toast {
+      background: #1E1B1E;
+      color: #FFF;
+      padding: 10px 16px;
+      border-radius: 12px;
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 12px;
+      text-align: center;
+      display: none;
+      animation: fadeIn 0.2s ease;
+    }
+  </style>
+</head>
+<body>
+
+  <canvas id="particles"></canvas>
+
+  <div id="app-container">
+    <div id="live-notification" class="notification-toast"></div>
+
+    <header>
+      <div class="brand-chip" onclick="openProfileModal()">
+        <span id="header-avatar">🦊</span>
+        <span id="header-username">Joueur 1</span>
+      </div>
+      <div class="lang-chip" onclick="openLangModal()">
+        <span id="current-lang-flag">🇫🇷</span>
+        <span id="current-lang-name">FR</span>
+      </div>
+    </header>
+
+    <!-- SCREEN 1: HOME -->
+    <div id="screen-home" class="screen active">
+      <div class="card" style="text-align: center; padding: 32px 20px;">
+        <div style="font-size: 54px; margin-bottom: 12px;">❤️</div>
+        <h1 id="i18n-title" style="font-size: 26px; font-weight: 900; color: #1F2937; margin-bottom: 8px;">TU ME CONNAIS VRAIMENT ? ❤️</h1>
+        <p id="i18n-slogan" style="font-size: 15px; font-weight: 600; color: var(--primary); margin-bottom: 24px;">Tu penses tout savoir sur moi ? Prouve-le !</p>
+
+        <button class="btn btn-primary" onclick="showScreen('screen-setup')" style="margin-bottom: 10px;">
+          ▶️ <span id="i18n-play-local">JOUER (Même téléphone)</span>
+        </button>
+
+        <button class="btn btn-secondary" onclick="showScreen('screen-online')" style="margin-bottom: 12px;">
+          🌐 <span>PARTIE À DISTANCE (EN LIGNE)</span>
+        </button>
+
+        <button class="btn btn-outline" onclick="openRulesModal()">
+          ❓ <span id="i18n-rules">COMMENT JOUER ?</span>
+        </button>
+      </div>
+
+      <div style="margin: 8px 4px 12px;">
+        <h3 style="font-size: 17px; font-weight: 800;">6 MODES DE JEU DISPONIBLES</h3>
+        <p style="font-size: 13px; color: var(--text-muted);">Plus de 300 questions originales et multilingues</p>
+      </div>
+
+      <div id="modes-list" style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 24px;"></div>
+    </div>
+
+    <!-- SCREEN 2: SETUP LOCAL -->
+    <div id="screen-setup" class="screen">
+      <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 14px;">
+        <button class="chip" onclick="showScreen('screen-home')" style="font-size: 16px;">⬅️ Retour</button>
+        <h2 style="font-size: 20px; font-weight: 800;">Configuration de la partie</h2>
+      </div>
+
+      <div class="card">
+        <h3 style="font-size: 15px; font-weight: 800; color: var(--primary); margin-bottom: 12px;">👥 JOUEURS</h3>
+        <div style="margin-bottom: 12px;">
+          <label style="font-size: 13px; font-weight: 600; display: block; margin-bottom: 4px;">Prénom du Joueur 1</label>
+          <input type="text" id="setup-p1" value="Joueur 1">
+        </div>
+        <div>
+          <label style="font-size: 13px; font-weight: 600; display: block; margin-bottom: 4px;">Prénom du Joueur 2</label>
+          <input type="text" id="setup-p2" value="Joueur 2">
+        </div>
+      </div>
+
+      <div class="card">
+        <h3 style="font-size: 15px; font-weight: 800; color: var(--primary); margin-bottom: 12px;">🎮 MODE DE JEU</h3>
+        <div class="options-grid" id="setup-modes-grid"></div>
+
+        <h3 style="font-size: 15px; font-weight: 800; color: var(--primary); margin: 16px 0 10px;">⚡ DIFFICULTÉ</h3>
+        <div class="options-grid" id="setup-diff-grid">
+          <div class="chip active" data-diff="EASY" onclick="selectDifficulty(this, 'EASY')">Facile</div>
+          <div class="chip" data-diff="MEDIUM" onclick="selectDifficulty(this, 'MEDIUM')">Moyen</div>
+          <div class="chip" data-diff="EXPERT" onclick="selectDifficulty(this, 'EXPERT')">Expert</div>
+        </div>
+
+        <h3 style="font-size: 15px; font-weight: 800; color: var(--primary); margin: 16px 0 10px;">🔢 NOMBRE DE QUESTIONS</h3>
+        <div class="options-grid" id="setup-count-grid">
+          <div class="chip" onclick="selectCount(this, 10)">10</div>
+          <div class="chip active" onclick="selectCount(this, 20)">20</div>
+          <div class="chip" onclick="selectCount(this, 30)">30</div>
+        </div>
+      </div>
+
+      <button class="btn btn-primary" onclick="startLocalGame()" style="margin-bottom: 24px;">
+        🚀 LANCER LA PARTIE
+      </button>
+    </div>
+
+    <!-- SCREEN 3: ONLINE LOBBY -->
+    <div id="screen-online" class="screen">
+      <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 14px;">
+        <button class="chip" onclick="showScreen('screen-home')" style="font-size: 16px;">⬅️ Accueil</button>
+        <h2 style="font-size: 20px; font-weight: 800;">Partie en ligne à distance 🌐</h2>
+      </div>
+
+      <div id="online-pre-room">
+        <div class="card">
+          <h3 style="font-size: 16px; font-weight: 800; color: var(--primary); margin-bottom: 8px;">Créer un salon</h3>
+          <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 14px;">Génère un code de salon et invite ton ami(e) ou partenaire à distance.</p>
+          <button class="btn btn-primary" onclick="createOnlineRoom()">➕ Créer un salon</button>
+        </div>
+
+        <div class="card">
+          <h3 style="font-size: 16px; font-weight: 800; color: var(--secondary); margin-bottom: 8px;">Rejoindre avec un code</h3>
+          <input type="text" id="join-room-code" placeholder="Ex: 5892" style="margin-bottom: 12px; text-align: center; font-size: 20px; font-weight: 800; letter-spacing: 2px;">
+          <button class="btn btn-secondary" onclick="joinOnlineRoom()">🔑 Rejoindre le salon</button>
+        </div>
+      </div>
+
+      <div id="online-active-room" style="display: none;">
+        <div class="card" style="text-align: center;">
+          <div style="font-size: 13px; font-weight: 800; color: var(--primary); margin-bottom: 6px;">CODE DU SALON</div>
+          <div id="room-code-badge" style="font-size: 38px; font-weight: 900; color: var(--on-primary-container); background: var(--primary-container); border: 2px solid var(--primary); border-radius: 16px; padding: 8px 24px; display: inline-block; margin-bottom: 12px;">#5892</div>
+          <p id="room-invite-link" style="font-size: 13px; color: var(--text-muted); word-break: break-all; margin-bottom: 16px;">https://tumeconnais.app/join?code=5892</p>
+
+          <div style="display: flex; gap: 8px; justify-content: center; margin-bottom: 16px;">
+            <button class="btn btn-outline" style="flex: 1; min-height: 44px; font-size: 13px;" onclick="copyRoomLink()">📋 Copier</button>
+            <button class="btn" style="flex: 1.2; min-height: 44px; background: #25D366; color: #FFF; font-size: 13px;" onclick="shareWhatsApp()">💬 WhatsApp</button>
+            <button class="btn btn-outline" style="flex: 1; min-height: 44px; font-size: 13px;" onclick="shareSms()">📱 SMS</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3 style="font-size: 15px; font-weight: 800; margin-bottom: 12px;">Joueurs connectés :</h3>
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
+            <div style="display: flex; align-items: center; gap: 10px;">
+              <span id="lobby-host-avatar" style="font-size: 26px;">🦊</span>
+              <div>
+                <strong id="lobby-host-name">Hôte</strong>
+                <div style="font-size: 12px; color: var(--success); font-weight: 600;">Connecté(e) ✅</div>
+              </div>
+            </div>
+          </div>
+          <div style="display: flex; align-items: center; justify-content: space-between;">
+            <div style="display: flex; align-items: center; gap: 10px;">
+              <span id="lobby-guest-avatar" style="font-size: 26px;">🐱</span>
+              <div>
+                <strong id="lobby-guest-name">Joueur 2</strong>
+                <div id="lobby-guest-status" style="font-size: 12px; color: var(--success); font-weight: 600;">Prêt(e) à jouer !</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <button class="btn btn-primary" onclick="startOnlineGame()" style="margin-bottom: 24px;">
+          🚀 Lancer la partie à distance
+        </button>
+      </div>
+    </div>
+
+    <!-- SCREEN 4: GAMEPLAY (GUESSING) -->
+    <div id="screen-game-guess" class="screen">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+        <span class="chip" id="game-mode-pill" style="font-weight: 800; color: var(--primary);">❤️ Couple</span>
+        <span id="game-progress" style="font-weight: 800;">1 / 20</span>
+        <span id="game-streak-badge" class="chip" style="background: var(--secondary-container); color: #B45309; font-weight: 800;">🔥 0</span>
+      </div>
+
+      <div class="card" style="background: var(--surface-variant); padding: 12px 16px; margin-bottom: 12px;">
+        <strong id="turn-indicator">Joueur 1, réponds à une question sur Joueur 2 :</strong>
+      </div>
+
+      <div class="card">
+        <span id="q-theme" class="chip" style="font-size: 11px; font-weight: 800; background: var(--primary-container); color: var(--on-primary-container); margin-bottom: 10px; display: inline-block;">Goûts</span>
+        <h2 id="q-text" style="font-size: 20px; font-weight: 800; line-height: 1.4; margin-bottom: 16px;">Quel est mon plat ou aliment préféré ?</h2>
+
+        <div style="font-size: 13px; color: var(--text-muted); margin-bottom: 6px;">Tape ta réponse ou clique sur une suggestion :</div>
+        <div id="q-chips" class="options-grid" style="margin-bottom: 14px;"></div>
+
+        <input type="text" id="guess-input" placeholder="Écris ta réponse ici..." style="font-size: 16px;">
+      </div>
+
+      <div style="display: flex; gap: 10px; margin-bottom: 24px;">
+        <button class="btn btn-outline" style="flex: 1;" onclick="skipQuestion()">JE PASSE ⏭️</button>
+        <button class="btn btn-primary" style="flex: 1.4;" onclick="submitGuess()">VALIDER MA RÉPONSE ➡️</button>
+      </div>
+    </div>
+
+    <!-- SCREEN 5: HANDOVER (PASS PHONE) -->
+    <div id="screen-handover" class="screen">
+      <div class="card" style="text-align: center; padding: 36px 20px; margin-top: 40px;">
+        <div style="font-size: 60px; margin-bottom: 16px;">📱</div>
+        <h2 id="handover-title" style="font-size: 24px; font-weight: 900; margin-bottom: 10px;">Passe le téléphone !</h2>
+        <p id="handover-subtitle" style="font-size: 15px; color: var(--text-muted); line-height: 1.5; margin-bottom: 28px;">
+          Attention ! Le joueur actif ne doit pas regarder. C'est à toi de vérifier la réponse en toute honnêteté !
+        </p>
+
+        <button class="btn btn-primary" onclick="proceedToValidation()">
+          👁️ C'EST À MOI ! VÉRIFIER
+        </button>
+      </div>
+    </div>
+
+    <!-- SCREEN 6: VALIDATION (EXPLICIT DISPLAY OF ANSWER + BUTTONS DIRECTLY BELOW + REVEAL) -->
+    <div id="screen-validate" class="screen">
+      <div class="card" style="background: var(--primary-container); padding: 12px 16px; margin-bottom: 12px;">
+        <strong id="val-header" style="color: var(--on-primary-container);">Étape de vérification</strong>
+      </div>
+
+      <div class="card" style="margin-bottom: 12px;">
+        <span id="val-theme" class="chip" style="font-size: 11px; font-weight: 800; background: var(--primary-container); color: var(--on-primary-container); margin-bottom: 6px; display: inline-block;">Thème</span>
+        <div id="val-question" style="font-size: 16px; font-weight: 700;">Question rappel</div>
+      </div>
+
+      <!-- BUG FIX: PROMINENT, BIG, HIGH CONTRAST ANSWER CARD -->
+      <div class="answer-highlight-card">
+        <div class="answer-highlight-label" id="val-who-answered">Le Joueur 1 a répondu :</div>
+        <div class="answer-highlight-text" id="val-displayed-answer">« PIZZA »</div>
+      </div>
+
+      <p style="text-align: center; font-weight: 700; margin-bottom: 14px;" id="val-prompt-correct">Est-ce la bonne réponse ou la vérité ?</p>
+
+      <!-- TWO VALIDATION BUTTONS DIRECTLY UNDERNEATH -->
+      <div style="display: flex; gap: 10px; margin-bottom: 16px;">
+        <button class="btn btn-error" style="flex: 1;" onclick="handleWrongAnswerClick()">
+          NON, CE N'EST PAS ÇA ! ❌
+        </button>
+        <button class="btn btn-success" style="flex: 1;" onclick="confirmAnswerValidation(true)">
+          OUI, C'EST EXACT ! ✅
+        </button>
+      </div>
+
+      <!-- EXPANDABLE REAL ANSWER REVEAL FIELD ON "NON" -->
+      <div id="wrong-answer-box" class="card" style="display: none; border-color: var(--error);">
+        <strong style="color: var(--error); display: block; margin-bottom: 6px;">Quelle était la vraie réponse correcte ?</strong>
+        <input type="text" id="real-answer-input" placeholder="Quelle était la vraie réponse ? (Optionnel)" style="margin-bottom: 12px;">
+        <button class="btn btn-error" onclick="confirmAnswerValidation(false)">
+          Confirmer la mauvaise réponse ❌
+        </button>
+      </div>
+    </div>
+
+    <!-- SCREEN 7: RESULTS -->
+    <div id="screen-results" class="screen">
+      <div class="card" style="text-align: center;">
+        <div style="font-size: 50px; margin-bottom: 8px;">🎉</div>
+        <h2 style="font-size: 24px; font-weight: 900; margin-bottom: 10px;">Résultats de la partie !</h2>
+        <div style="background: var(--primary-container); color: var(--on-primary-container); padding: 12px 16px; border-radius: 14px; font-weight: 800; font-size: 17px; margin-bottom: 16px;" id="res-verdict">
+          Vous vous connaissez par cœur ! ❤️
+        </div>
+
+        <div style="display: flex; gap: 10px; margin-bottom: 16px;">
+          <div style="flex: 1; background: #FFF5F7; padding: 14px; border-radius: 14px; border: 1.5px solid var(--primary);">
+            <div style="font-size: 20px;">👑</div>
+            <strong id="res-p1-name">Joueur 1</strong>
+            <div id="res-p1-score" style="font-size: 22px; font-weight: 900; color: var(--primary); margin: 6px 0;">0 pts</div>
+            <div id="res-p1-stats" style="font-size: 12px; color: var(--text-muted);">0 ✅ | 0 ❌</div>
+          </div>
+          <div style="flex: 1; background: #FFFDF5; padding: 14px; border-radius: 14px; border: 1.5px solid var(--secondary);">
+            <div style="font-size: 20px;">👑</div>
+            <strong id="res-p2-name">Joueur 2</strong>
+            <div id="res-p2-score" style="font-size: 22px; font-weight: 900; color: var(--secondary); margin: 6px 0;">0 pts</div>
+            <div id="res-p2-stats" style="font-size: 12px; color: var(--text-muted);">0 ✅ | 0 ❌</div>
+          </div>
+        </div>
+
+        <button class="btn btn-primary" onclick="shareScoreNative()" style="margin-bottom: 10px;">
+          📲 PARTAGER MON SCORE
+        </button>
+        <button class="btn btn-outline" onclick="showScreen('screen-setup')" style="margin-bottom: 10px;">
+          🔄 REJOUER
+        </button>
+        <button class="btn btn-ghost" onclick="showScreen('screen-home')">
+          🏠 Retour à l'accueil
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: PROFILE & AUTH -->
+  <div id="modal-profile" class="modal-backdrop">
+    <div class="modal-card">
+      <h3 style="font-size: 18px; font-weight: 800; margin-bottom: 14px;">👤 Mon Profil Joueur</h3>
+      <div style="margin-bottom: 14px;">
+        <label style="font-size: 13px; font-weight: 600; display: block; margin-bottom: 6px;">Choisis ton Avatar :</label>
+        <div id="avatar-picker" class="options-grid"></div>
+      </div>
+      <div style="margin-bottom: 14px;">
+        <label style="font-size: 13px; font-weight: 600; display: block; margin-bottom: 4px;">Pseudo / Prénom :</label>
+        <input type="text" id="profile-name-input" value="Joueur 1">
+      </div>
+      <button class="btn btn-primary" onclick="saveProfile()" style="margin-bottom: 8px;">Enregistrer</button>
+      <button class="btn btn-ghost" onclick="closeProfileModal()">Fermer</button>
+    </div>
+  </div>
+
+  <!-- MODAL: LANGUAGE SELECTOR -->
+  <div id="modal-lang" class="modal-backdrop">
+    <div class="modal-card">
+      <h3 style="font-size: 18px; font-weight: 800; margin-bottom: 14px;">🌍 Choisir la langue</h3>
+      <div id="lang-list" style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px;"></div>
+      <button class="btn btn-ghost" onclick="closeLangModal()">Fermer</button>
+    </div>
+  </div>
+
+  <!-- MODAL: HOW TO PLAY -->
+  <div id="modal-rules" class="modal-backdrop">
+    <div class="modal-card" style="max-height: 80vh; overflow-y: auto;">
+      <h3 style="font-size: 18px; font-weight: 800; color: var(--primary); margin-bottom: 14px;">❓ Comment jouer ?</h3>
+      <p style="font-size: 14px; line-height: 1.6; color: var(--text); margin-bottom: 12px;">
+        <strong>🎯 BUT DU JEU :</strong> Prouver à quel point deux personnes se connaissent réellement à travers des questions personnelles, drôles ou profondes.<br><br>
+        <strong>🔄 DÉROULEMENT :</strong><br>
+        1. À tour de rôle, l'un répond à une question concernant l'autre.<br>
+        2. Tu tapes ta réponse ou tu choisis une suggestion rapide.<br>
+        3. Passe l'appareil à l'autre joueur (ou joue à distance via le salon de jeu !).<br>
+        4. Le joueur vérifie la réponse : « OUI » (+10 points) ou « NON » (0 pt).<br><br>
+        <strong>⭐ SCORE & SÉRIES :</strong><br>
+        • Bonne réponse : +10 points.<br>
+        • Question passée : 0 point.<br>
+        • Bonus de série : +5 points tous les 5 succès consécutifs !
+      </p>
+      <button class="btn btn-primary" onclick="closeRulesModal()">OK, COMPRIS !</button>
+    </div>
+  </div>
+
+  <script>
+    // --- GLOBAL GAME STATE ---
+    const state = {
+      lang: 'fr',
+      profile: { name: 'Joueur 1', avatar: '🦊' },
+      localConfig: {
+        p1: 'Joueur 1',
+        p2: 'Joueur 2',
+        mode: 'COUPLE',
+        diff: 'EASY',
+        count: 20
+      },
+      onlineRoom: null,
+      activeGame: {
+        questions: [],
+        currentIndex: 0,
+        player1Answer: '', // GLOBAL STATE FOR ANSWER
+        currentExplanation: '',
+        p1Stats: { score: 0, correct: 0, wrong: 0, skipped: 0, streak: 0 },
+        p2Stats: { score: 0, correct: 0, wrong: 0, skipped: 0, streak: 0 }
+      }
+    };
+
+    const MODES = [
+      { id: 'COUPLE', emoji: '❤️', fr: 'Couple', desc: 'Pour amoureux et couples' },
+      { id: 'BEST_FRIENDS_M', emoji: '🤝', fr: 'Meilleurs Amis', desc: 'Pour deux meilleurs amis' },
+      { id: 'BEST_FRIENDS_F', emoji: '👭', fr: 'Meilleures Amies', desc: 'Pour deux meilleures amies' },
+      { id: 'FRIENDS', emoji: '😂', fr: 'Entre Potes', desc: 'Anecdotes et délires entre potes' },
+      { id: 'SCHOOL', emoji: '🎓', fr: 'Spécial École', desc: 'Pour camarades de classe et études' },
+      { id: 'GETTING_TO_KNOW', emoji: '✨', fr: 'Apprendre à se connaître', desc: 'Pour nouveaux rendez-vous et découverte' }
+    ];
+
+    const LANGUAGES = [
+      { code: 'fr', flag: '🇫🇷', name: 'Français', rtl: false },
+      { code: 'en', flag: '🇬🇧', name: 'English', rtl: false },
+      { code: 'es', flag: '🇪🇸', name: 'Español', rtl: false },
+      { code: 'pt', flag: '🇵🇹', name: 'Português', rtl: false },
+      { code: 'de', flag: '🇩🇪', name: 'Deutsch', rtl: false },
+      { code: 'zh', flag: '🇨🇳', name: '简体中文', rtl: false },
+      { code: 'ar', flag: '🇸🇦', name: 'العربية', rtl: true }
+    ];
+
+    const AVATARS = ['🦊', '🐱', '🐼', '🦁', '🦄', '🚀', '👑', '⭐', '🔥', '💖', '🎮', '🌈'];
+
+    // SAMPLE QUESTION BANK FOR WEB RUNTIME
+    const QUESTION_BANK = {
+      COUPLE: [
+        { theme: 'Goûts', text: 'Quel est mon plat ou aliment préféré ?', chips: ['Pizza', 'Pâtes', 'Sushi', 'Burger', 'Chocolat'] },
+        { theme: 'Soirée', text: 'Quel genre de soirée me détend le plus avec toi ?', chips: ['Film & plaid', 'Resto romantique', 'Balade nocturne', 'Cuisiner à deux'] },
+        { theme: 'Habitudes', text: 'Combien de réveils ou alarmes me faut-il pour sortir du lit ?', chips: ['1 seul', '2 ou 3', 'Au moins 5 !'] },
+        { theme: 'Attentions', text: 'Quelle petite attention spontanée me fait fondre à coup sûr ?', chips: ['Un café au lit', 'Un massage', 'Un mot doux', 'Un câlin spontané'] },
+        { theme: 'Avenir', text: 'Quel est mon plus grand rêve de voyage avec toi ?', chips: ['Japon', 'Italie', 'Îles tropicales', 'Road trip'] },
+        { theme: 'Souvenirs', text: 'Quelle a été ma toute première impression quand on s\'est rencontrés ?', chips: ['Coup de foudre', 'Timide', 'Intrigant', 'Très drôle'] }
+      ],
+      BEST_FRIENDS_M: [
+        { theme: 'Hobbies', text: 'Quel est mon jeu vidéo ou loisir préféré du moment ?', chips: ['FPS', 'Sport/Fifa', 'RPG', 'Séries', 'Musique'] },
+        { theme: 'Fast-food', text: 'Quel snack ou fast-food commande-je presque systématiquement ?', chips: ['Burger', 'Tacos', 'Kebab', 'Pizza'] },
+        { theme: 'Retard', text: 'Suis-je en avance, à l\'heure ou toujours en retard ?', chips: ['En avance', 'Pile à l\'heure', 'Toujours en retard'] },
+        { theme: 'Talent caché', text: 'Quel est mon talent caché le plus inattendu ?', chips: ['Imitations', 'Cuisine', 'Bricolage', 'Sport'] }
+      ],
+      BEST_FRIENDS_F: [
+        { theme: 'Confidences', text: 'Quel est le sujet dont on peut parler des heures au téléphone ?', chips: ['Amours & Crush', 'Projets & Voyages', 'Ragots drôles', 'Mode'] },
+        { theme: 'Shopping', text: 'Dans quelle boutique ai-je toujours envie d\'entrer en premier ?', chips: ['Vêtements', 'Maquillage/Soin', 'Librairie', 'Déco'] },
+        { theme: 'Réconfort', text: 'Quand j\'ai un coup de blues, quelle douceur me remonte le moral ?', chips: ['Chocolat', 'Glace', 'Bubble tea', 'Pâtisserie'] }
+      ],
+      FRIENDS: [
+        { theme: 'Délires', text: 'Qui de nous deux est le plus susceptible d\'arriver en retard ?', chips: ['Moi évidemment', 'Toi sans hésiter', 'Égalité parfaite'] },
+        { theme: 'Survie', text: 'Si on était perdus en forêt, qui survivrait le plus longtemps ?', chips: ['Moi', 'Toi', 'On ne tient pas 1 jour'] },
+        { theme: 'Batterie', text: 'À quel pourcentage de batterie mon téléphone est-il souvent ?', chips: ['Toujours sous 15%', 'Entre 40% et 70%', 'Toujours à 90%+'] }
+      ],
+      SCHOOL: [
+        { theme: 'Matière', text: 'Quelle est ma matière préférée en cours ?', chips: ['Maths', 'Histoire', 'Langues', 'Sciences', 'Sport', 'Arts'] },
+        { theme: 'Place', text: 'Où préfères-je m\'asseoir en classe ?', chips: ['Au 1er rang', 'Au milieu tranquille', 'Au fond près de la fenêtre'] }
+      ],
+      GETTING_TO_KNOW: [
+        { theme: 'Humeur', text: 'Qu\'est-ce qui me met immédiatement de bonne humeur ?', chips: ['Bonne musique', 'Repas gourmand', 'Message sympa', 'Soleil'] },
+        { theme: 'Sorties', text: 'Préfères-je une soirée calme ou une sortie animée ?', chips: ['Soirée calme cosy', 'Sortie animée festive', 'Un équilibre'] }
+      ]
+    };
+
+    // --- SCREEN NAVIGATION ---
+    function showScreen(screenId) {
+      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+      const target = document.getElementById(screenId);
+      if (target) target.classList.add('active');
+      window.scrollTo(0, 0);
+    }
+
+    function notify(msg) {
+      const toast = document.getElementById('live-notification');
+      toast.innerText = msg;
+      toast.style.display = 'block';
+      setTimeout(() => { toast.style.display = 'none'; }, 3500);
+    }
+
+    // --- INITIALIZATION ---
+    function init() {
+      // Render modes on home
+      const modesContainer = document.getElementById('modes-list');
+      modesContainer.innerHTML = MODES.map(m => `
+        <div class="card" style="padding: 16px; display: flex; align-items: center; gap: 14px; cursor: pointer; margin-bottom: 0;" onclick="selectModeHome('${m.id}')">
+          <span style="font-size: 32px;">${m.emoji}</span>
+          <div>
+            <strong style="color: var(--primary); font-size: 16px;">${m.fr}</strong>
+            <p style="font-size: 12px; color: var(--text-muted);">${m.desc}</p>
+          </div>
+        </div>
+      `).join('');
+
+      // Setup modes grid
+      const setupModesGrid = document.getElementById('setup-modes-grid');
+      setupModesGrid.innerHTML = MODES.map(m => `
+        <div class="chip ${m.id === 'COUPLE' ? 'active' : ''}" onclick="selectSetupMode(this, '${m.id}')">
+          ${m.emoji} ${m.fr}
+        </div>
+      `).join('');
+
+      // Avatar picker
+      document.getElementById('avatar-picker').innerHTML = AVATARS.map(a => `
+        <div class="chip ${a === state.profile.avatar ? 'active' : ''}" style="font-size: 20px;" onclick="selectAvatar(this, '${a}')">${a}</div>
+      `).join('');
+
+      // Language modal
+      document.getElementById('lang-list').innerHTML = LANGUAGES.map(l => `
+        <div class="card" style="padding: 12px 16px; display: flex; align-items: center; justify-content: space-between; cursor: pointer; margin-bottom: 0;" onclick="setLang('${l.code}')">
+          <span>${l.flag} ${l.name}</span>
+          ${l.code === state.lang ? '✅' : ''}
+        </div>
+      `).join('');
+
+      initParticles();
+    }
+
+    function selectModeHome(modeId) {
+      state.localConfig.mode = modeId;
+      showScreen('screen-setup');
+      const chips = document.querySelectorAll('#setup-modes-grid .chip');
+      chips.forEach((c, idx) => {
+        c.classList.toggle('active', MODES[idx].id === modeId);
+      });
+    }
+
+    function selectSetupMode(el, modeId) {
+      document.querySelectorAll('#setup-modes-grid .chip').forEach(c => c.classList.remove('active'));
+      el.classList.add('active');
+      state.localConfig.mode = modeId;
+    }
+
+    function selectDifficulty(el, diff) {
+      document.querySelectorAll('#setup-diff-grid .chip').forEach(c => c.classList.remove('active'));
+      el.classList.add('active');
+      state.localConfig.diff = diff;
+    }
+
+    function selectCount(el, count) {
+      document.querySelectorAll('#setup-count-grid .chip').forEach(c => c.classList.remove('active'));
+      el.classList.add('active');
+      state.localConfig.count = count;
+    }
+
+    // --- GAME ENGINE ---
+    function startLocalGame() {
+      const p1 = document.getElementById('setup-p1').value.trim() || 'Joueur 1';
+      const p2 = document.getElementById('setup-p2').value.trim() || 'Joueur 2';
+      state.localConfig.p1 = p1;
+      state.localConfig.p2 = p2;
+
+      const pool = QUESTION_BANK[state.localConfig.mode] || QUESTION_BANK.COUPLE;
+      state.activeGame.questions = [...pool];
+      state.activeGame.currentIndex = 0;
+      state.activeGame.p1Stats = { score: 0, correct: 0, wrong: 0, skipped: 0, streak: 0 };
+      state.activeGame.p2Stats = { score: 0, correct: 0, wrong: 0, skipped: 0, streak: 0 };
+
+      renderQuestion();
+      showScreen('screen-game-guess');
+    }
+
+    function renderQuestion() {
+      const q = state.activeGame.questions[state.activeGame.currentIndex % state.activeGame.questions.length];
+      const isP1 = (state.activeGame.currentIndex % 2 === 0);
+      const guesser = isP1 ? state.localConfig.p1 : state.localConfig.p2;
+      const subject = isP1 ? state.localConfig.p2 : state.localConfig.p1;
+      const streak = isP1 ? state.activeGame.p1Stats.streak : state.activeGame.p2Stats.streak;
+
+      document.getElementById('turn-indicator').innerText = `${guesser}, réponds à une question sur ${subject} :`;
+      document.getElementById('q-theme').innerText = q.theme;
+      document.getElementById('q-text').innerText = q.text;
+      document.getElementById('game-progress').innerText = `${state.activeGame.currentIndex + 1} / ${state.localConfig.count}`;
+      document.getElementById('game-streak-badge').innerText = `🔥 ${streak}`;
+      document.getElementById('guess-input').value = '';
+
+      const chipsContainer = document.getElementById('q-chips');
+      if (q.chips && q.chips.length) {
+        chipsContainer.innerHTML = q.chips.map(c => `
+          <div class="chip" onclick="selectChipAnswer('${c.replace(/'/g, "\\'")}')">${c}</div>
+        `).join('');
+      } else {
+        chipsContainer.innerHTML = '';
+      }
+    }
+
+    function selectChipAnswer(text) {
+      document.getElementById('guess-input').value = text;
+    }
+
+    function submitGuess() {
+      const answer = document.getElementById('guess-input').value.trim();
+      if (!answer) {
+        alert("Veuillez saisir ou choisir une réponse !");
+        return;
+      }
+
+      // CRITICAL BUG FIX: SAVE VALUE INTO GLOBAL STATE
+      state.activeGame.player1Answer = answer;
+
+      const isP1 = (state.activeGame.currentIndex % 2 === 0);
+      const subject = isP1 ? state.localConfig.p2 : state.localConfig.p1;
+      const guesser = isP1 ? state.localConfig.p1 : state.localConfig.p2;
+
+      document.getElementById('handover-title').innerText = `Passe le téléphone à ${subject} ! 📱`;
+      document.getElementById('handover-subtitle').innerText = `Attention ! ${guesser} ne doit pas regarder. C'est à ${subject} de vérifier la réponse en toute honnêteté !`;
+
+      showScreen('screen-handover');
+    }
+
+    function proceedToValidation() {
+      const isP1 = (state.activeGame.currentIndex % 2 === 0);
+      const guesser = isP1 ? state.localConfig.p1 : state.localConfig.p2;
+      const subject = isP1 ? state.localConfig.p2 : state.localConfig.p1;
+      const q = state.activeGame.questions[state.activeGame.currentIndex % state.activeGame.questions.length];
+
+      document.getElementById('val-header').innerText = `Vérification par ${subject}`;
+      document.getElementById('val-theme').innerText = q.theme;
+      document.getElementById('val-question').innerText = q.text;
+
+      // CRITICAL BUG FIX: DISPLAY CLAIREMENT ET EN GROS LA RÉPONSE DONNÉE DANS LE CADRE
+      document.getElementById('val-who-answered').innerText = `${guesser} a répondu :`;
+      document.getElementById('val-displayed-answer').innerText = `« ${state.activeGame.player1Answer} »`;
+
+      // Hide wrong answer explanation input by default
+      document.getElementById('wrong-answer-box').style.display = 'none';
+      document.getElementById('real-answer-input').value = '';
+
+      showScreen('screen-validate');
+    }
+
+    function handleWrongAnswerClick() {
+      // Step 4: Si le Joueur clique sur NON, ouvrir le champ pour saisir la VRAIE réponse
+      const box = document.getElementById('wrong-answer-box');
+      box.style.display = 'block';
+      box.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function confirmAnswerValidation(isCorrect) {
+      const isP1 = (state.activeGame.currentIndex % 2 === 0);
+      const stats = isP1 ? state.activeGame.p1Stats : state.activeGame.p2Stats;
+
+      if (isCorrect) {
+        stats.correct++;
+        stats.score += 10;
+        stats.streak++;
+        if (stats.streak % 5 === 0) {
+          stats.score += 5;
+          notify(`🔥 SÉRIE DE ${stats.streak} ! +5 POINTS BONUS !`);
+        } else {
+          notify(`Bravo ! +10 points pour ${isP1 ? state.localConfig.p1 : state.localConfig.p2} ! 🎉`);
+        }
+      } else {
+        stats.wrong++;
+        stats.streak = 0;
+        notify(`Réponse comptabilisée incorrecte (0 pt) ❌`);
+      }
+
+      state.activeGame.currentIndex++;
+
+      if (state.activeGame.currentIndex >= state.localConfig.count) {
+        renderResults();
+        showScreen('screen-results');
+      } else {
+        renderQuestion();
+        showScreen('screen-game-guess');
+      }
+    }
+
+    function skipQuestion() {
+      const isP1 = (state.activeGame.currentIndex % 2 === 0);
+      const stats = isP1 ? state.activeGame.p1Stats : state.activeGame.p2Stats;
+      stats.skipped++;
+      stats.streak = 0;
+      notify("Question passée (0 pt)");
+
+      state.activeGame.currentIndex++;
+      if (state.activeGame.currentIndex >= state.localConfig.count) {
+        renderResults();
+        showScreen('screen-results');
+      } else {
+        renderQuestion();
+        showScreen('screen-game-guess');
+      }
+    }
+
+    function renderResults() {
+      const s1 = state.activeGame.p1Stats;
+      const s2 = state.activeGame.p2Stats;
+      const totalCorrect = s1.correct + s2.correct;
+      const totalValidated = (s1.correct + s1.wrong) + (s2.correct + s2.wrong);
+      const pct = totalValidated > 0 ? Math.round((totalCorrect / totalValidated) * 100) : 0;
+
+      let verdict = "Une nouvelle partie s'impose ! 😂";
+      if (pct >= 90) verdict = "Vous vous connaissez par cœur ! ❤️";
+      else if (pct >= 70) verdict = "Vous êtes vraiment complices ! 🥰";
+      else if (pct >= 40) verdict = "Il vous reste des choses à découvrir ! 😉";
+
+      document.getElementById('res-verdict').innerText = verdict;
+      document.getElementById('res-p1-name').innerText = state.localConfig.p1;
+      document.getElementById('res-p1-score').innerText = `${s1.score} pts`;
+      document.getElementById('res-p1-stats').innerText = `${s1.correct} ✅ | ${s1.wrong} ❌`;
+
+      document.getElementById('res-p2-name').innerText = state.localConfig.p2;
+      document.getElementById('res-p2-score').innerText = `${s2.score} pts`;
+      document.getElementById('res-p2-stats').innerText = `${s2.correct} ✅ | ${s2.wrong} ❌`;
+    }
+
+    // --- ONLINE ROOM SIMULATION & SHARING ---
+    function createOnlineRoom() {
+      const code = Math.floor(1000 + Math.random() * 9000);
+      const url = `https://tumeconnais.app/join?code=${code}`;
+      state.onlineRoom = { code, url, host: state.profile.name };
+
+      document.getElementById('room-code-badge').innerText = `#${code}`;
+      document.getElementById('room-invite-link').innerText = url;
+      document.getElementById('lobby-host-name').innerText = state.profile.name;
+      document.getElementById('lobby-host-avatar').innerText = state.profile.avatar;
+
+      document.getElementById('online-pre-room').style.display = 'none';
+      document.getElementById('online-active-room').style.display = 'block';
+
+      notify(`Salon #${code} créé avec succès !`);
+    }
+
+    function joinOnlineRoom() {
+      const code = document.getElementById('join-room-code').value.trim();
+      if (!code) {
+        alert("Veuillez entrer un code de salon !");
+        return;
+      }
+      state.onlineRoom = { code, url: `https://tumeconnais.app/join?code=${code}`, host: 'Ami(e)' };
+
+      document.getElementById('room-code-badge').innerText = `#${code}`;
+      document.getElementById('room-invite-link').innerText = state.onlineRoom.url;
+      document.getElementById('lobby-host-name').innerText = "Ami(e)";
+      document.getElementById('lobby-guest-name').innerText = state.profile.name;
+      document.getElementById('lobby-guest-avatar').innerText = state.profile.avatar;
+
+      document.getElementById('online-pre-room').style.display = 'none';
+      document.getElementById('online-active-room').style.display = 'block';
+
+      notify(`Vous avez rejoint le salon #${code} !`);
+    }
+
+    function copyRoomLink() {
+      if (state.onlineRoom) {
+        navigator.clipboard.writeText(state.onlineRoom.url);
+        notify("Lien d'invitation copié !");
+      }
+    }
+
+    function shareWhatsApp() {
+      if (state.onlineRoom) {
+        const text = encodeURIComponent(`Rejoins ma partie sur « Tu me connais vraiment ? ❤️ » ! Code du salon : #${state.onlineRoom.code}\nLien : ${state.onlineRoom.url}`);
+        window.open(`https://api.whatsapp.com/send?text=${text}`, '_blank');
+      }
+    }
+
+    function shareSms() {
+      if (state.onlineRoom) {
+        const text = encodeURIComponent(`Rejoins ma partie sur « Tu me connais vraiment ? ❤️ » ! Code : #${state.onlineRoom.code} - ${state.onlineRoom.url}`);
+        window.location.href = `sms:?body=${text}`;
+      }
+    }
+
+    function startOnlineGame() {
+      state.localConfig.p1 = state.onlineRoom.host;
+      state.localConfig.p2 = state.profile.name;
+      startLocalGame();
+    }
+
+    function shareScoreNative() {
+      const s1 = state.activeGame.p1Stats;
+      const s2 = state.activeGame.p2Stats;
+      const text = `🎮 Tu me connais vraiment ? ❤️\n👑 ${state.localConfig.p1} : ${s1.score} pts\n👑 ${state.localConfig.p2} : ${s2.score} pts\nEt vous, vous vous connaissez vraiment ?`;
+      if (navigator.share) {
+        navigator.share({ title: 'Tu Me Connais Vraiment ? ❤️', text });
+      } else {
+        navigator.clipboard.writeText(text);
+        notify("Résultat copié dans le presse-papier !");
+      }
+    }
+
+    // --- MODALS ---
+    function openProfileModal() { document.getElementById('modal-profile').classList.add('open'); }
+    function closeProfileModal() { document.getElementById('modal-profile').classList.remove('open'); }
+    function openLangModal() { document.getElementById('modal-lang').classList.add('open'); }
+    function closeLangModal() { document.getElementById('modal-lang').classList.remove('open'); }
+    function openRulesModal() { document.getElementById('modal-rules').classList.add('open'); }
+    function closeRulesModal() { document.getElementById('modal-rules').classList.remove('open'); }
+
+    function selectAvatar(el, a) {
+      document.querySelectorAll('#avatar-picker .chip').forEach(c => c.classList.remove('active'));
+      el.classList.add('active');
+      state.profile.avatar = a;
+    }
+
+    function saveProfile() {
+      const name = document.getElementById('profile-name-input').value.trim() || 'Joueur 1';
+      state.profile.name = name;
+      document.getElementById('header-avatar').innerText = state.profile.avatar;
+      document.getElementById('header-username').innerText = state.profile.name;
+      document.getElementById('setup-p1').value = name;
+      closeProfileModal();
+      notify("Profil mis à jour !");
+    }
+
+    function setLang(code) {
+      state.lang = code;
+      const l = LANGUAGES.find(x => x.code === code);
+      if (l) {
+        document.getElementById('current-lang-flag').innerText = l.flag;
+        document.getElementById('current-lang-name').innerText = l.code.toUpperCase();
+        document.documentElement.setAttribute('dir', l.rtl ? 'rtl' : 'ltr');
+      }
+      closeLangModal();
+      notify(`Langue changée : ${l ? l.name : code}`);
+    }
+
+    // --- CANVAS PARTICLES ---
+    function initParticles() {
+      const canvas = document.getElementById('particles');
+      const ctx = canvas.getContext('2d');
+      let w = canvas.width = window.innerWidth;
+      let h = canvas.height = window.innerHeight;
+      window.addEventListener('resize', () => {
+        w = canvas.width = window.innerWidth;
+        h = canvas.height = window.innerHeight;
+      });
+
+      const items = Array.from({ length: 18 }, () => ({
+        x: Math.random() * w,
+        y: Math.random() * h,
+        speed: 0.5 + Math.random() * 0.8,
+        size: 10 + Math.random() * 12,
+        isHeart: Math.random() > 0.3
+      }));
+
+      function loop() {
+        ctx.clearRect(0, 0, w, h);
+        items.forEach(p => {
+          p.y -= p.speed;
+          if (p.y < -20) { p.y = h + 20; p.x = Math.random() * w; }
+          ctx.font = `${p.size}px serif`;
+          ctx.globalAlpha = 0.18;
+          ctx.fillText(p.isHeart ? '❤️' : '✨', p.x, p.y);
+        });
+        requestAnimationFrame(loop);
+      }
+      loop();
+    }
+
+    init();
+  </script>
+</body>
+</html>

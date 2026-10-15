@@ -1,0 +1,6 @@
+{
+  "name": "Tu Me Connais Vraiment ?",
+  "description": "Jeu convivial et interactif pour deux personnes afin de tester à quel point vous vous connaissez vraiment.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
